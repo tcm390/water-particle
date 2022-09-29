@@ -261,7 +261,6 @@ const swimmingRippleSplashFragment = `\
     uniform sampler2D splashTexture2;
     uniform sampler2D voronoiNoiseTexture;
     
-    
     const float PI = 3.1415926535897932384626433832795;
     
     void main() {
@@ -426,7 +425,7 @@ const dropletRippleFragment = `\
         float broken = abs( sin( 1.0 - vBroken ) ) - texture2D( noiseMap, vUv ).g;
         if ( broken < 0.0001 ) discard;
         if(gl_FragColor.a > 0.){
-            gl_FragColor = vec4(0.9, 0.9, 0.9, 1.0);
+            gl_FragColor = vec4(0.6, 0.6, 0.6, 1.0);
         }
         else{
             discard;

@@ -324,11 +324,11 @@ const getDroplet = () => {
     return dropletgroup;
 }
 const getBubble = () => {
-    const particleCount = 40;
+    const particleCount = 20;
     const attributeSpecs = [];
     attributeSpecs.push({name: 'scales', itemSize: 1});
     attributeSpecs.push({name: 'offset', itemSize: 2});
-    const geometry2 = new THREE.PlaneGeometry(0.03, 0.03);
+    const geometry2 = new THREE.PlaneGeometry(0.02, 0.02);
     const geometry = _getGeometry(geometry2, attributeSpecs, particleCount);
 
     const material = new THREE.ShaderMaterial({
