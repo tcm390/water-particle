@@ -365,7 +365,7 @@ const getBubble = () => {
     return bubble;
 }
 const getLittleSplash = () => {
-    const particleCount = 50;
+    const particleCount = 200;
     const attributeSpecs = [];
     attributeSpecs.push({name: 'scales', itemSize: 1});
     attributeSpecs.push({name: 'broken', itemSize: 1});
@@ -401,7 +401,7 @@ const getLittleSplash = () => {
         particleCount: particleCount,
         maxEmmit: 5,
         velocity: [particleCount],
-        acc: new THREE.Vector3(0, -0.003, 0)
+        acc: new THREE.Vector3(0, -0.002, 0)
     }
     const brokenAttribute = littleSplash.geometry.getAttribute('broken');
     for (let i = 0; i < particleCount; i++) {
