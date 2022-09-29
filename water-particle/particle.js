@@ -91,7 +91,7 @@ class WaterParticleEffect {
     
     const _handleRipple = () => {
       if (this.rippleMesh) {
-        if (this.fallingSpeed > 6) {
+        if (this.fallingSpeed > 3) {
           this.rippleMesh.visible = true;
           this.rippleGroup.position.copy(this.collisionPosition);
           this.rippleMesh.material.uniforms.vBroken.value = 0.1;
@@ -129,7 +129,7 @@ class WaterParticleEffect {
         const textureRotationAttribute = this.divingLowerSplash.geometry.getAttribute('textureRotation');
         const particleCount = this.divingLowerSplash.info.particleCount;
         for (let i = 0; i < particleCount; i++) {
-          if (this.fallingSpeed > 6) {
+          if (this.fallingSpeed > 3) {
             this.divingLowerSplash.info.velocity[i].x = Math.sin(i) * .055 + (Math.random() - 0.5) * 0.001;
             this.divingLowerSplash.info.velocity[i].y = 0.12 + 0.01 * Math.random();
             this.divingLowerSplash.info.velocity[i].z = Math.cos(i) * .055 + (Math.random() - 0.5) * 0.001;
@@ -187,7 +187,7 @@ class WaterParticleEffect {
         const particleCount = this.divingHigherSplash.info.particleCount;
         
         for (let i = 0; i < particleCount; i++) {
-          if (this.fallingSpeed > 6) {
+          if (this.fallingSpeed > 3) {
             this.divingHigherSplash.info.velocity[i].y = (0.12 + 0.01 * Math.random()) * 0.8;
             brokenAttribute.setX(i, 0.22 + Math.random() * 0.1);
             scalesAttribute.setX(i, 0.5 + Math.random() * 0.5);
@@ -409,7 +409,7 @@ class WaterParticleEffect {
             if (scalesAttribute.getX(i) <= 0) {
               if (this.currentSpeed > 0.1) {
                 localVector3.x += (Math.random() - 0.5) * 0.5;
-                localVector3.y += (Math.random() - 0.5) * 0.2;
+                localVector3.y += -0.2 -(Math.random()) * 0.5;
                 localVector3.z += (Math.random() - 0.5) * 0.5;
                 this.bubble.info.velocity[i].x = -this.playerDir.x * 0.005;
                 this.bubble.info.velocity[i].y = 0.0025 + Math.random() * 0.0025;
