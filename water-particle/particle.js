@@ -406,44 +406,40 @@ class WaterParticleEffect {
         if (timestamp - this.bubble.info.lastEmmitTime > 100 && this.contactWater) {
           for (let i = 0; i < (Math.floor(this.currentSpeed * 10 + 1) * 5); i ++) {
             localVector3.set(this.player.position.x, this.player.position.y, this.player.position.z);
-              if (scalesAttribute.getX(i) <= 0) {
-                if (this.currentSpeed > 0.1) {
-                  localVector3.x += (Math.random() - 0.5) * 0.5;
-                  localVector3.y += (Math.random() - 0.5) * 0.2;
-                  localVector3.z += (Math.random() - 0.5) * 0.5;
-                  this.bubble.info.velocity[i].x = -this.playerDir.x * 0.005;
-                  this.bubble.info.velocity[i].y = 0.0025 + Math.random() * 0.0025;
-                  this.bubble.info.velocity[i].z = -this.playerDir.z * 0.005;
-                }
-                else {
-                  localVector3.x += -this.playerDir.x * 0.25;
-                  localVector3.z += -this.playerDir.z * 0.25;
-                  localVector3.x += (Math.random() - 0.5) * 0.5;
-                  localVector3.z += (Math.random() - 0.5) * 0.5;
-                  localVector3.y -= this.player.avatar.height * 0.6;
-                  localVector3.y += (Math.random()) * 0.2
-                  this.bubble.info.velocity[i].x = 0;
-                  this.bubble.info.velocity[i].y = 0.0025 + Math.random() * 0.0025;
-                  this.bubble.info.velocity[i].z = 0;
-                }
-                if (localVector3.y > this.waterSurfaceHeight)
-                  localVector3.y = this.collisionPosition.y;
-                positionsAttribute.setXYZ(i, localVector3.x, localVector3.y, localVector3.z);
-                
-                this.bubble.info.offset[i] = Math.floor(Math.random() * 29);
-                this.bubble.info.lastTime[i] = (50 + Math.random() * 50);
-                this.bubble.info.startTime[i] = 0;
-                scalesAttribute.setX(i, Math.random());
-                if (this.currentSpeed <= 0.1 && !this.player.hasAction('swim')) {
-                  scalesAttribute.setX(i, 0);
-                }
-                currentEmmit++;
+            if (scalesAttribute.getX(i) <= 0) {
+              if (this.currentSpeed > 0.1) {
+                localVector3.x += (Math.random() - 0.5) * 0.5;
+                localVector3.y += (Math.random() - 0.5) * 0.2;
+                localVector3.z += (Math.random() - 0.5) * 0.5;
+                this.bubble.info.velocity[i].x = -this.playerDir.x * 0.005;
+                this.bubble.info.velocity[i].y = 0.0025 + Math.random() * 0.0025;
+                this.bubble.info.velocity[i].z = -this.playerDir.z * 0.005;
               }
-              if (currentEmmit > this.bubble.info.maxEmmit) {
-                this.bubble.info.lastEmmitTime = timestamp;
-                break;
+              else {
+                localVector3.x += -this.playerDir.x * 0.25 + (Math.random() - 0.5) * 0.5;
+                localVector3.z += -this.playerDir.z * 0.25 + (Math.random() - 0.5) * 0.5;
+                localVector3.y -= this.player.avatar.height * 0.6 + (Math.random()) * 0.2;
+                this.bubble.info.velocity[i].x = 0;
+                this.bubble.info.velocity[i].y = 0.0025 + Math.random() * 0.0025;
+                this.bubble.info.velocity[i].z = 0;
               }
+              if (localVector3.y > this.waterSurfaceHeight)
+                localVector3.y = this.collisionPosition.y;
+              positionsAttribute.setXYZ(i, localVector3.x, localVector3.y, localVector3.z);
               
+              this.bubble.info.offset[i] = Math.floor(Math.random() * 29);
+              this.bubble.info.lastTime[i] = (50 + Math.random() * 50);
+              this.bubble.info.startTime[i] = 0;
+              scalesAttribute.setX(i, Math.random());
+              if (this.currentSpeed <= 0.1 && !this.player.hasAction('swim')) {
+                scalesAttribute.setX(i, 0);
+              }
+              currentEmmit++;
+            }
+            if (currentEmmit > this.bubble.info.maxEmmit) {
+              this.bubble.info.lastEmmitTime = timestamp;
+              break;
+            }
           }
         }
         for (let i = 0; i < particleCount; i++) {
