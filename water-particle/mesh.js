@@ -365,7 +365,7 @@ const getBubble = () => {
     return bubble;
 }
 const getLittleSplash = () => {
-    const particleCount = 200;
+    const particleCount = 50;
     const attributeSpecs = [];
     attributeSpecs.push({name: 'scales', itemSize: 1});
     attributeSpecs.push({name: 'broken', itemSize: 1});

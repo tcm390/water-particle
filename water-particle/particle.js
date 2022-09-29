@@ -570,7 +570,7 @@ class WaterParticleEffect {
           );
           _playLittleSplash(
             this.playerDir.x * 0.6 + localVector4.x * 0.03 + (Math.random() - 0.5) * 0.05, 
-            -0.46, 
+            -0.43, 
             this.playerDir.z * 0.6 + localVector4.z * 0.03 + (Math.random() - 0.5) * 0.05,
             20,
             1,
@@ -583,7 +583,7 @@ class WaterParticleEffect {
           );
           _playLittleSplash(
             this.playerDir.x * 0.6 - localVector4.x * 0.03 + (Math.random() - 0.5) * 0.05, 
-            -0.46, 
+            -0.43, 
             this.playerDir.z * 0.6 - localVector4.z * 0.03 + (Math.random() - 0.5) * 0.05,
             20,
             1,
@@ -599,7 +599,7 @@ class WaterParticleEffect {
           );
           _playLittleSplash(
             this.playerDir.x * 0.6 + localVector4.x * 0.03 * right + (Math.random() - 0.5) * 0.05, 
-            -0.46, 
+            -0.43, 
             this.playerDir.z * 0.6 + localVector4.z * 0.03 * right + (Math.random() - 0.5) * 0.05,
             20,
             1,
