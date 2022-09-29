@@ -118,7 +118,7 @@ const divingLowerSplashFragment = `\
             rotated
         );
         if(splash.r > 0.1){
-            gl_FragColor = vec4(0.9, 0.9, 0.9, 1.0);
+            gl_FragColor = vec4(0.6, 0.6, 0.6, 1.0);
         }
         if(vPos.y < waterSurfacePos){
             gl_FragColor.a = 0.;
@@ -127,7 +127,7 @@ const divingLowerSplashFragment = `\
         float broken = abs( sin( 1.0 - vBroken ) ) - texture2D( noiseMap, rotated * 2.5 ).g;
         if ( broken < 0.0001 ) discard;
         if(gl_FragColor.a > 0.){
-            gl_FragColor = vec4(0.9, 0.9, 0.9, 1.0);
+            gl_FragColor = vec4(0.6, 0.6, 0.6, 1.0);
         }
         else{
             discard;
@@ -197,7 +197,7 @@ const divingHigherSplashFragment = `\
         float broken = abs( sin( 1.0 - vBroken ) ) - texture2D( noiseMap, vUv ).g;
         if ( broken < 0.0001 ) discard;
         if(gl_FragColor.a > 0.){
-            gl_FragColor = vec4(0.9, 0.9, 0.9, 1.0);
+            gl_FragColor = vec4(0.6, 0.6, 0.6, 1.0);
         }
         else{
             discard;

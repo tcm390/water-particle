@@ -364,6 +364,53 @@ const getBubble = () => {
     }
     return bubble;
 }
+const getLittleSplash = () => {
+    const particleCount = 50;
+    const attributeSpecs = [];
+    attributeSpecs.push({name: 'scales', itemSize: 1});
+    attributeSpecs.push({name: 'broken', itemSize: 1});
+    attributeSpecs.push({name: 'textureRotation', itemSize: 1});
+    const geometry2 = new THREE.PlaneGeometry(0.18, 0.18);
+    const geometry = _getGeometry(geometry2, attributeSpecs, particleCount);
+
+    const material = new THREE.ShaderMaterial({
+        uniforms: {
+            cameraBillboardQuaternion: {
+                value: new THREE.Quaternion(),
+            },
+            splashTexture: {
+                value: splashTexture2,
+            },
+            waterSurfacePos: {
+                value: 0,
+            },
+            noiseMap: {
+                value: noiseMap
+            },
+        },
+        vertexShader: divingLowerSplashVertex,
+        fragmentShader: divingLowerSplashFragment,
+        side: THREE.DoubleSide,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+    });
+    const littleSplash = new THREE.InstancedMesh(geometry, material, particleCount);
+    
+    littleSplash.info = {
+        particleCount: particleCount,
+        maxEmmit: 5,
+        velocity: [particleCount],
+        acc: new THREE.Vector3(0, -0.003, 0)
+    }
+    const brokenAttribute = littleSplash.geometry.getAttribute('broken');
+    for (let i = 0; i < particleCount; i++) {
+        brokenAttribute.setX(i, 1);
+        littleSplash.info.velocity[i] = new THREE.Vector3();
+    }
+    brokenAttribute.needsUpdate = true;
+    return littleSplash;
+}
 
 export {
     getRippleGroup,
@@ -372,4 +419,5 @@ export {
     getSwimmingRippleSplash,
     getDroplet,
     getBubble,
+    getLittleSplash,
 };

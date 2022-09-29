@@ -7,6 +7,7 @@ import {
   getSwimmingRippleSplash,
   getDroplet,
   getBubble,
+  getLittleSplash,
 } from './mesh.js';
 
 const {useSound, useInternals} = metaversefile;
@@ -16,6 +17,8 @@ const soundFiles = sounds.getSoundFiles();
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
+
+let testCount = 0;
 
 class WaterParticleEffect {
   constructor() {
@@ -54,6 +57,8 @@ class WaterParticleEffect {
     this.bubble = null;
     this.initBubble();
 
+    this.littleSplash = null;
+    this.initLittleSplash();
   }
   
   update() {
@@ -121,7 +126,7 @@ class WaterParticleEffect {
     };
     _handleRipple();
 
-    const _handledivingLowerSplash = () =>{
+    const _handledivingLowerSplash = () => {
       if (this.divingLowerSplash) { 
         const brokenAttribute = this.divingLowerSplash.geometry.getAttribute('broken');
         const positionsAttribute = this.divingLowerSplash.geometry.getAttribute('positions');
@@ -178,7 +183,7 @@ class WaterParticleEffect {
     }
     _handledivingLowerSplash();
 
-    const _handledivingHigherSplash = () =>{
+    const _handledivingHigherSplash = () => {
       if (this.divingHigherSplash) { 
         const brokenAttribute = this.divingHigherSplash.geometry.getAttribute('broken');
         const positionsAttribute = this.divingHigherSplash.geometry.getAttribute('positions');
@@ -222,7 +227,7 @@ class WaterParticleEffect {
     }
     _handledivingHigherSplash();
 
-    const _handleSwimmingRippleSplash = () =>{
+    const _handleSwimmingRippleSplash = () => {
       const particleCount = this.swimmingRippleSplash.info.particleCount;
       const rippleCount = this.swimmingRippleSplash.info.rippleCount;
       if(this.swimmingRippleSplash.info.currentRippleIndex >= rippleCount){
@@ -314,7 +319,7 @@ class WaterParticleEffect {
     }
     _handleSwimmingRippleSplash();
 
-    const _handleDroplet = () =>{
+    const _handleDroplet = () => {
       if (this.droplet && this.dropletRipple) { 
         const rippleBrokenAttribute = this.dropletRipple.geometry.getAttribute('broken');
         const rippleWaveFreqAttribute = this.dropletRipple.geometry.getAttribute('waveFreq');
@@ -396,9 +401,9 @@ class WaterParticleEffect {
     }
     _handleDroplet();
 
-    const _handleBubble = () =>{
-      const particleCount = this.bubble.info.particleCount;
+    const _handleBubble = () => {
       if (this.bubble && this.player && this.player.avatar) {
+        const particleCount = this.bubble.info.particleCount;
         let currentEmmit = 0;
         const offsetAttribute = this.bubble.geometry.getAttribute('offset');
         const positionsAttribute = this.bubble.geometry.getAttribute('positions');
@@ -473,9 +478,84 @@ class WaterParticleEffect {
     }
     _handleBubble();
 
+    const _handleLittleSplash = () => {
+      
+      if (this.littleSplash) {
+        const particleCount = this.littleSplash.info.particleCount;
+        const positionsAttribute = this.littleSplash.geometry.getAttribute('positions');
+        const scalesAttribute = this.littleSplash.geometry.getAttribute('scales');
+        const brokenAttribute = this.littleSplash.geometry.getAttribute('broken');
+        for (let i = 0; i < particleCount; i++) {
+          scalesAttribute.setX(i, scalesAttribute.getX(i) + 0.01);
+          positionsAttribute.setXYZ(  
+            i, 
+            positionsAttribute.getX(i) + this.littleSplash.info.velocity[i].x,
+            positionsAttribute.getY(i) + this.littleSplash.info.velocity[i].y,
+            positionsAttribute.getZ(i) + this.littleSplash.info.velocity[i].z
+          );
+          if(brokenAttribute.getX(i) < 1){
+            brokenAttribute.setX(i, brokenAttribute.getX(i) + 0.016);
+            scalesAttribute.setX(i, scalesAttribute.getX(i) + 0.01);
+          }
+          this.littleSplash.info.velocity[i].y += this.littleSplash.info.acc.y;
+        }
+        positionsAttribute.needsUpdate = true;
+        scalesAttribute.needsUpdate = true;
+        brokenAttribute.needsUpdate = true;
+        
+        this.littleSplash.material.uniforms.cameraBillboardQuaternion.value.copy(this.camera.quaternion);
+        this.littleSplash.material.uniforms.waterSurfacePos.value = this.waterSurfaceHeight;
+      }
+    }
+    _handleLittleSplash();
 
+    const _playLittleSplash = (px, py, pz, maxEmmit, scale) => {
+      if (this.littleSplash) {
+        let count = 0;
+        const particleCount = this.littleSplash.info.particleCount;
+        const positionsAttribute = this.littleSplash.geometry.getAttribute('positions');
+        const scalesAttribute = this.littleSplash.geometry.getAttribute('scales');
+        const brokenAttribute = this.littleSplash.geometry.getAttribute('broken');
+        const textureRotationAttribute = this.littleSplash.geometry.getAttribute('textureRotation');
+        for (let i = 0; i < particleCount; i++) {
+          if (brokenAttribute.getX(i) >= 1) {
+            this.littleSplash.info.velocity[i].x = (Math.random() - 0.5) * 0.05;
+            this.littleSplash.info.velocity[i].y = 0.18 + Math.random() * 0.1;
+            this.littleSplash.info.velocity[i].z = (Math.random() - 0.5) * 0.05;
+
+            scalesAttribute.setX(i, (1 + Math.random()) * scale);
+            brokenAttribute.setX(i, 0.25 + Math.random() * 0.2);
+            textureRotationAttribute.setX(i, Math.random() * 2);
+  
+            positionsAttribute.setXYZ(  
+              i, 
+              px + (Math.random() - 0.5) * 0.1 + this.littleSplash.info.velocity[i].x,
+              py + Math.random() * 0.1,
+              pz + (Math.random() - 0.5) * 0.1 + this.littleSplash.info.velocity[i].z
+            );
+            this.littleSplash.info.velocity[i].divideScalar(5);
+            brokenAttribute.setX(i, 0.25 + Math.random() * 0.2);
+            count ++;
+          }
+          if (count >= maxEmmit) {
+            break;
+          }
+        }
+        positionsAttribute.needsUpdate = true;
+        scalesAttribute.needsUpdate = true;
+        brokenAttribute.needsUpdate = true;
+        textureRotationAttribute.needsUpdate = true;
+      }
+    }
+    if (testCount % 40 === 0 && this.player) {
+      console.log('emmit')
+      // _playLittleSplash(this.player.position.x + Math.random(), 0, this.player.position.z, 5, 3);
+    }
+
+    
     this.lastContactWater = this.contactWater;
     this.scene.updateMatrixWorld();
+    testCount ++;
   }
 
   //########################################################## initialize particle mesh #####################################################
@@ -504,6 +584,10 @@ class WaterParticleEffect {
   initBubble() {
     this.bubble = getBubble();
     this.scene.add(this.bubble);
+  }
+  initLittleSplash() {
+    this.littleSplash = getLittleSplash();
+    this.scene.add(this.littleSplash);
   }
 }
 
