@@ -502,7 +502,7 @@ class WaterParticleEffect {
             
             
             brokenAttribute.setX(i, brokenAttribute.getX(i) + 0.015);
-            scalesAttribute.setX(i, scalesAttribute.getX(i) + 0.015);
+            scalesAttribute.setX(i, scalesAttribute.getX(i) + 0.05);
             if(this.currentSpeed > 0.3) {
               positionsAttribute.setXYZ(  
                 i, 
@@ -519,8 +519,6 @@ class WaterParticleEffect {
                 positionsAttribute.getZ(i)
               );
             }
-            
-            
             //this.littleSplash.info.velocity[i].y += this.littleSplash.info.acc.y;
           }
         }
