@@ -64,6 +64,7 @@ class WaterParticleEffect {
     this.initBubble();
 
     this.littleSplash = null;
+    this.lastLittleSplashEmitTime = 0;
     this.littleSplashGroup = new THREE.Group();
     this.initLittleSplash();
   }
@@ -495,28 +496,37 @@ class WaterParticleEffect {
         const positionsAttribute = this.littleSplash.geometry.getAttribute('positions');
         const scalesAttribute = this.littleSplash.geometry.getAttribute('scales');
         const brokenAttribute = this.littleSplash.geometry.getAttribute('broken');
-        const textureRotationAttribute = this.littleSplash.geometry.getAttribute('textureRotation');
         for (let i = 0; i < particleCount; i++) {
           if (brokenAttribute.getX(i) < 1) {
             scalesAttribute.setX(i, scalesAttribute.getX(i) + 0.01);
-            positionsAttribute.setXYZ(  
-              i, 
-              positionsAttribute.getX(i) + this.littleSplash.info.velocity[i].x,
-              positionsAttribute.getY(i) + this.littleSplash.info.velocity[i].y,
-              positionsAttribute.getZ(i) + this.littleSplash.info.velocity[i].z
-            );
             
-            brokenAttribute.setX(i, brokenAttribute.getX(i) + 0.02);
-            scalesAttribute.setX(i, scalesAttribute.getX(i) + 0.01);
-            // textureRotationAttribute.setX(i, textureRotationAttribute.getX(i) + 0.01);
             
-            this.littleSplash.info.velocity[i].y += this.littleSplash.info.acc.y;
+            brokenAttribute.setX(i, brokenAttribute.getX(i) + 0.015);
+            scalesAttribute.setX(i, scalesAttribute.getX(i) + 0.015);
+            if(this.currentSpeed > 0.3) {
+              positionsAttribute.setXYZ(  
+                i, 
+                positionsAttribute.getX(i) + - this.playerDir.x * 0.2 * 0.3,
+                positionsAttribute.getY(i) + this.littleSplash.info.velocity[i].y,
+                positionsAttribute.getZ(i) + - this.playerDir.z * 0.2 * 0.3
+              );
+            }
+            else{
+              positionsAttribute.setXYZ(  
+                i, 
+                positionsAttribute.getX(i),
+                positionsAttribute.getY(i)- 0.01,
+                positionsAttribute.getZ(i)
+              );
+            }
+            
+            
+            //this.littleSplash.info.velocity[i].y += this.littleSplash.info.acc.y;
           }
         }
         positionsAttribute.needsUpdate = true;
         scalesAttribute.needsUpdate = true;
         brokenAttribute.needsUpdate = true;
-        textureRotationAttribute.needsUpdate = true;
         
         this.littleSplash.material.uniforms.cameraBillboardQuaternion.value.copy(this.camera.quaternion);
         this.littleSplash.material.uniforms.waterSurfacePos.value = this.waterSurfaceHeight;
@@ -534,18 +544,18 @@ class WaterParticleEffect {
         const textureRotationAttribute = this.littleSplash.geometry.getAttribute('textureRotation');
         for (let i = 0; i < particleCount; i++) {
           if (brokenAttribute.getX(i) >= 1) {
-            this.littleSplash.info.velocity[i].set(velocity.x, velocity.y, velocity.z);
+            // this.littleSplash.info.velocity[i].set(velocity.x, velocity.y, velocity.z);
             scalesAttribute.setX(i, (1 + Math.random()) * scale);
             brokenAttribute.setX(i, 0 + Math.random() * 0.1);
             textureRotationAttribute.setX(i, Math.random() * 2);
             positionsAttribute.setXYZ(  
               i, 
-              px + (Math.random() - 0.5) * 0.2 + this.littleSplash.info.velocity[i].x,
-              py + Math.random() * 0.1,
-              pz + (Math.random() - 0.5) * 0.2 + this.littleSplash.info.velocity[i].z
+              px + (Math.random() - 0.5) * 0.02,
+              py + (Math.random() - 0.5) * 0.02,
+              pz + (Math.random() - 0.5) * 0.02
             );
-            this.littleSplash.info.velocity[i].divideScalar(5);
-            brokenAttribute.setX(i, 0.25 + Math.random() * 0.2);
+            // this.littleSplash.info.velocity[i].divideScalar(5);
+            brokenAttribute.setX(i, 0.2 + Math.random() * 0.15);
             count ++;
           }
           if (count >= maxEmmit) {
@@ -561,53 +571,48 @@ class WaterParticleEffect {
     
     const _handleSwimmingSplash = (swimAction) => {
       localVector4.set(this.playerDir.x, this.playerDir.y, this.playerDir.z).applyQuaternion(rotateY);
-      if (this.lastSwimmingHand !== this.player.avatarCharacterSfx.currentSwimmingHand && this.player.avatarCharacterSfx.currentSwimmingHand) {
-        if (swimAction.animationType === 'breaststroke') {
-          localVector6.set(
-            localVector4.x * 0.07 - this.playerDir.x * 0.1,
-            0.1 + Math.random() * 0.025, 
-            localVector4.z * 0.07 - this.playerDir.z * 0.1 
-          );
-          _playLittleSplash(
-            this.playerDir.x * 0.6 + localVector4.x * 0.03 + (Math.random() - 0.5) * 0.05, 
-            -0.43, 
-            this.playerDir.z * 0.6 + localVector4.z * 0.03 + (Math.random() - 0.5) * 0.05,
-            20,
-            1,
-            localVector6
-          );
-          localVector6.set(
-            -localVector4.x * 0.07 - this.playerDir.x * 0.1,
-            0.1 + Math.random() * 0.025, 
-            -localVector4.z * 0.07 - this.playerDir.z * 0.1 
-          );
-          _playLittleSplash(
-            this.playerDir.x * 0.6 - localVector4.x * 0.03 + (Math.random() - 0.5) * 0.05, 
-            -0.43, 
-            this.playerDir.z * 0.6 - localVector4.z * 0.03 + (Math.random() - 0.5) * 0.05,
-            20,
-            1,
-            localVector6
-          ); 
-        }
-        else {
-          const right = this.player.avatarCharacterSfx.currentSwimmingHand === 'right' ? 1 : -1;
-          localVector6.set(
-            right * localVector4.x * 0.07 - this.playerDir.x * 0.1,
-            0.1 + Math.random() * 0.025, 
-            right * localVector4.z * 0.07 - this.playerDir.z * 0.1 
-          );
-          _playLittleSplash(
-            this.playerDir.x * 0.6 + localVector4.x * 0.03 * right + (Math.random() - 0.5) * 0.05, 
-            -0.43, 
-            this.playerDir.z * 0.6 + localVector4.z * 0.03 * right + (Math.random() - 0.5) * 0.05,
-            20,
-            1,
-            localVector6
-          );
-        }
-        
+      if (swimAction.animationType === 'breaststroke') {
       }
+      else if (swimAction.animationType === 'freestyle'){
+        if (this.player.avatarCharacterSfx.currentSwimmingHand && this.lastSwimmingHand !== this.player.avatarCharacterSfx.currentSwimmingHand) {
+          const right = this.player.avatarCharacterSfx.currentSwimmingHand === 'right' ? 1 : -1;
+          _playLittleSplash(
+            this.playerDir.x * 0.4 + (Math.random() - 0.5) * 0.1 + localVector4.x * 0.15 * right, 
+            -0.25, 
+            this.playerDir.z * 0.4 + (Math.random() - 0.5) * 0.1 + localVector4.z * 0.15 * right,
+            5,
+            1 + Math.random() * 0.2,
+            localVector6
+          );
+        }
+        if(timestamp - this.lastLittleSplashEmitTime > 30) {
+          // localVector6.set(
+          //   - this.playerDir.x * 0.2,
+          //   0, 
+          //   - this.playerDir.z * 0.2 
+          // );
+          const right = this.player.avatarCharacterSfx.currentSwimmingHand === 'right' ? 1 : 0.8;
+          const left = this.player.avatarCharacterSfx.currentSwimmingHand === 'right' ? 0.8 : 1;
+          _playLittleSplash(
+            this.playerDir.x * 0.1 + (Math.random() - 0.5) * 0.1 + localVector4.x * 0.1, 
+            -0.25, 
+            this.playerDir.z * 0.1 + (Math.random() - 0.5) * 0.1 + localVector4.z * 0.1,
+            1,
+            right + Math.random() * 0.2,
+            localVector6
+          );
+          _playLittleSplash(
+            this.playerDir.x * 0.1 + (Math.random() - 0.5) * 0.1 + localVector4.x * -0.1, 
+            -0.25, 
+            this.playerDir.z * 0.1 + (Math.random() - 0.5) * 0.1 + localVector4.z * -0.1,
+            1,
+            left + Math.random() * 0.2,
+            localVector6
+          );
+          this.lastLittleSplashEmitTime = timestamp;
+        }
+      }
+      
       this.lastSwimmingHand = this.player.avatarCharacterSfx.currentSwimmingHand; 
     }
 
