@@ -588,7 +588,13 @@ class WaterParticleEffect {
         
         for (let i = 0; i < particleCount; i ++) {
           if (brokenAttribute.getX(i) < 1) {
-            brokenAttribute.setX(i, brokenAttribute.getX(i) * 1.07);
+            if (this.currentSpeed > 0.1) {
+              brokenAttribute.setX(i, brokenAttribute.getX(i) * 1.07);
+            }
+            else {
+              brokenAttribute.setX(i, brokenAttribute.getX(i) * 1.1);
+            } 
+              
             scalesAttribute.setY(i, scalesAttribute.getY(i) * 1.04);
             positionsAttribute.setXYZ(
               i,
@@ -632,7 +638,7 @@ class WaterParticleEffect {
             const theta = 2. * Math.PI * emitCount / maxEmit;
             positionsAttribute.setXYZ(
               i,
-              0.25 * right + Math.sin(theta) * 0.1,
+              (0.25 + Math.random() * 0.05) * right + Math.sin(theta) * 0.1,
               0,
               Math.cos(theta) * 0.1
             ) 
