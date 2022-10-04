@@ -433,6 +433,86 @@ const dropletRippleFragment = `\
     ${THREE.ShaderChunk.logdepthbuf_fragment}
     }
 `
+const freestyleSplashVertex = `\
+              
+    ${THREE.ShaderChunk.common}
+    ${THREE.ShaderChunk.logdepthbuf_pars_vertex}
+    varying vec2 vUv;
+    varying vec3 vPos;
+    varying float vBroken;
+    
+    attribute float broken;
+    attribute vec3 positions;
+    attribute vec2 scales;
+    attribute vec3 rotation;
+    
+    void main() {
+        mat3 rotX = mat3(
+            1.0, 0.0, 0.0, 
+            0.0, cos(rotation.x), sin(rotation.x), 
+            0.0, -sin(rotation.x), cos(rotation.x)
+        );
+        mat3 rotY = mat3(
+            cos(rotation.y), 0.0, -sin(rotation.y), 
+            0.0, 1.0, 0.0, 
+            sin(rotation.y), 0.0, cos(rotation.y)
+        );
+        mat3 rotZ = mat3(
+            cos(rotation.z), sin(rotation.z), 0.0,
+            -sin(rotation.z), cos(rotation.z), 0.0, 
+            0.0, 0.0 , 1.0
+        );
+        vUv = uv;
+        vBroken = broken;
+        vec3 pos = position;
+        pos.xy *= scales;
+        pos *= rotY;
+        pos *= rotZ;
+        pos *= rotX;
+        pos += positions;
+        vec4 modelPosition = modelMatrix * vec4(pos, 1.0);
+        vec4 viewPosition = viewMatrix * modelPosition;
+        vec4 projectionPosition = projectionMatrix * viewPosition;
+        vPos = modelPosition.xyz;
+        gl_Position = projectionPosition;
+        ${THREE.ShaderChunk.logdepthbuf_vertex}
+    }
+`
+const freestyleSplashFragment = `\
+    ${THREE.ShaderChunk.logdepthbuf_pars_fragment}
+    uniform float uTime;
+    uniform sampler2D splashTexture;
+    uniform sampler2D noiseMap;
+    uniform float waterSurfacePos;
+    
+    varying vec2 vUv;
+    varying vec3 vPos;
+    varying float vBroken;
+    
+    void main() {
+        vec4 splash = texture2D(
+            splashTexture,
+            vUv
+        );
+        gl_FragColor = splash;
+
+        if(splash.r < 0.5){
+            discard;
+        }
+        gl_FragColor.a *= vUv.y * 1.5;
+        if (vUv.y < 0.1) {
+            gl_FragColor.a = 0.;
+        }
+        
+        if(vPos.y < waterSurfacePos){
+            gl_FragColor.a = 0.;
+        }
+
+        float broken = abs( sin( 1.0 - vBroken ) ) - texture2D( noiseMap, vec2(vUv.x, vUv.y - uTime * 2.) ).g;
+        if ( broken < 0.0001 ) discard;
+        ${THREE.ShaderChunk.logdepthbuf_fragment}
+    }
+`
 
 export {
   rippleVertex, rippleFragment,
@@ -441,4 +521,5 @@ export {
   swimmingRippleSplashVertex, swimmingRippleSplashFragment,
   dropletVertex, dropletFragment,
   dropletRippleVertex, dropletRippleFragment,
+  freestyleSplashVertex, freestyleSplashFragment,
 };

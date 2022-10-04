@@ -8,6 +8,7 @@ import {
     swimmingRippleSplashVertex, swimmingRippleSplashFragment,
     dropletVertex, dropletFragment,
     dropletRippleVertex, dropletRippleFragment,
+    freestyleSplashVertex, freestyleSplashFragment,
 } from './shader.js';
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
@@ -365,7 +366,7 @@ const getBubble = () => {
     return bubble;
 }
 const getLittleSplash = () => {
-    const particleCount = 100;
+    const particleCount = 60;
     const attributeSpecs = [];
     attributeSpecs.push({name: 'scales', itemSize: 1});
     attributeSpecs.push({name: 'broken', itemSize: 1});
@@ -401,7 +402,8 @@ const getLittleSplash = () => {
         particleCount: particleCount,
         maxEmmit: 5,
         velocity: [particleCount],
-        acc: new THREE.Vector3(0, -0.002, 0)
+        acc: new THREE.Vector3(0, -0.002, 0),
+        brokenVelocity: [particleCount]
     }
     const brokenAttribute = littleSplash.geometry.getAttribute('broken');
     for (let i = 0; i < particleCount; i++) {
@@ -410,6 +412,47 @@ const getLittleSplash = () => {
     }
     brokenAttribute.needsUpdate = true;
     return littleSplash;
+}
+const getFreestyleSplash = () => {
+    const group = new THREE.Group();
+    const freeStyleGroup = new THREE.Group();
+    const particleCount = 50;
+    const attributeSpecs = [];
+    attributeSpecs.push({name: 'broken', itemSize: 1});
+    attributeSpecs.push({name: 'scales', itemSize: 2});
+    attributeSpecs.push({name: 'rotation', itemSize: 3});
+    const geometry2 = new THREE.PlaneGeometry(0.08, 0.08);
+    const geometry = _getGeometry(geometry2, attributeSpecs, particleCount);
+    const material= new THREE.ShaderMaterial({
+        uniforms: {
+            uTime: {
+                value:0
+            },
+            splashTexture: {
+                value: splashTexture3,
+            },
+            waterSurfacePos: {
+                value: 0,
+            },
+            noiseMap:{
+                value: noiseMap
+            },
+        },
+        vertexShader: freestyleSplashVertex,
+        fragmentShader: freestyleSplashFragment,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+    });
+    const divingHigherSplash = new THREE.InstancedMesh(geometry, material, particleCount);
+    divingHigherSplash.info = {
+        particleCount: particleCount,
+    }
+    group.add(divingHigherSplash);
+    group.rotation.x = Math.PI / 2.3;
+    freeStyleGroup.add(group)
+    return freeStyleGroup;
 }
 
 export {
@@ -420,4 +463,5 @@ export {
     getDroplet,
     getBubble,
     getLittleSplash,
+    getFreestyleSplash,
 };
