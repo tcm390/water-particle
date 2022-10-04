@@ -624,9 +624,8 @@ class WaterParticleEffect {
     if (hasSwim && this.waterSurfaceHeight < this.player.position.y) {
        _handleSwimmingSplash(swimAction);
     }
-    const _handleFreestyleSplash = (swimAction) => {
+    const _handleFreestyleSplash = () => {
       if (this.freestyleSplash) {
-        
         this.freestyleSplashGroup.rotation.copy(this.player.rotation);
         this.freestyleSplashGroup.position.copy(this.player.position);
         this.freestyleSplashGroup.position.x += this.playerDir.x * 0.6;
@@ -641,7 +640,7 @@ class WaterParticleEffect {
         let emitCount = 0;
         let maxEmit = 15;
         for (let i = 0; i < particleCount; i ++) {
-          if (swimAction.animationType === 'freestyle') {
+          if (hasSwim && swimAction.animationType === 'freestyle' && this.waterSurfaceHeight < this.player.position.y) {
               if (
                 this.lastFreestyleHand !== this.player.avatarCharacterSfx.currentSwimmingHand 
                 && (brokenAttribute.getX(i) >= 1 || brokenAttribute.getX(i) <= 0)
@@ -686,6 +685,7 @@ class WaterParticleEffect {
         rotationAttribute.needsUpdate = true;
       
         this.freestyleSplash.material.uniforms.uTime.value = timestamp / 1000;
+        this.freestyleSplash.material.uniforms.waterSurfacePos.value = this.waterSurfaceHeight;
         this.lastFreestyleHand = this.player.avatarCharacterSfx.currentSwimmingHand;
       }
       else {
@@ -694,9 +694,9 @@ class WaterParticleEffect {
         }
       }
     }
-    if (hasSwim && this.waterSurfaceHeight < this.player.position.y) {
-      _handleFreestyleSplash(swimAction);
-    }
+    
+    _handleFreestyleSplash();
+    
     
     this.lastContactWater = this.contactWater;
     this.scene.updateMatrixWorld();
