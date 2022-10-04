@@ -209,7 +209,7 @@ class WaterParticleEffect {
         
         for (let i = 0; i < particleCount; i++) {
           if (this.fallingSpeed > 3) {
-            this.divingHigherSplash.info.velocity[i].y = 0.08 + 0.04 * Math.random();
+            this.divingHigherSplash.info.velocity[i].y = 0.08 + 0.03 * Math.random();
             brokenAttribute.setX(i, 0.22 + Math.random() * 0.1);
             scalesAttribute.setX(i, 0.5 + Math.random() * 0.5);
             const theta = 2. * Math.PI * i / particleCount;
@@ -523,7 +523,7 @@ class WaterParticleEffect {
               );
               scalesAttribute.setX(i, scalesAttribute.getX(i) + 0.02);
             }
-            //this.littleSplash.info.velocity[i].y += this.littleSplash.info.acc.y;
+            this.littleSplash.info.velocity[i].add(this.littleSplash.info.acc[i]);
           }
         }
         positionsAttribute.needsUpdate = true;
@@ -536,7 +536,7 @@ class WaterParticleEffect {
     }
     _handleLittleSplash();
 
-    const _playLittleSplash = (px, py, pz, maxEmmit, scale, velocity, brokenVelocity) => {
+    const _playLittleSplash = (px, py, pz, maxEmmit, scale, velocity, acc, brokenVelocity) => {
       if (this.littleSplash) {
         let count = 0;
         const particleCount = this.littleSplash.info.particleCount;
@@ -547,6 +547,7 @@ class WaterParticleEffect {
         for (let i = 0; i < particleCount; i++) {
           if (brokenAttribute.getX(i) >= 1) {
             this.littleSplash.info.velocity[i].set(velocity.x, velocity.y, velocity.z);
+            this.littleSplash.info.acc[i].set(acc.x, acc.y, acc.z);
             scalesAttribute.setX(i, (1 + Math.random()) * scale);
             brokenAttribute.setX(i, 0 + Math.random() * 0.1);
             textureRotationAttribute.setX(i, Math.random() * 2);
@@ -579,37 +580,42 @@ class WaterParticleEffect {
       else if (swimAction.animationType === 'freestyle'){
         if (this.player.avatarCharacterSfx.currentSwimmingHand && this.lastSwimmingHand !== this.player.avatarCharacterSfx.currentSwimmingHand) {
           const right = this.player.avatarCharacterSfx.currentSwimmingHand === 'right' ? 1 : -1;
-          localVector6.set(0.03, 0.003, 0.03);
+          localVector5.set(0, -0.001, 0);
+          localVector6.set(0.03, 0.01, 0.03);
           _playLittleSplash(
-            this.playerDir.x * 0.65 + (Math.random() - 0.5) * 0.1 + localVector4.x * 0.25 * right, 
+            this.playerDir.x * 0.62 + localVector4.x * 0.25 * right, 
             0, 
-            this.playerDir.z * 0.65 + (Math.random() - 0.5) * 0.1 + localVector4.z * 0.25 * right,
+            this.playerDir.z * 0.62 + localVector4.z * 0.25 * right,
             5,
             1.3 + Math.random() * 0.2,
-            localVector6, 
+            localVector6,
+            localVector5, 
             1.2
           );
         }
         if(timestamp - this.lastLittleSplashEmitTime > 30) {
-          const right = this.player.avatarCharacterSfx.currentSwimmingHand === 'right' ? 1 : 0.8;
-          const left = this.player.avatarCharacterSfx.currentSwimmingHand === 'right' ? 0.8 : 1;
+          const right = this.player.avatarCharacterSfx.currentSwimmingHand === 'right' ? 1.2 : 0.8;
+          const left = this.player.avatarCharacterSfx.currentSwimmingHand === 'right' ? 0.8 : 1.2;
+          localVector5.set(0, 0, 0);
           localVector6.set(0.06, 0, 0.06);
           _playLittleSplash(
-            this.playerDir.x * 0.35 + (Math.random() - 0.5) * 0.1 + localVector4.x * 0.12, 
+            this.playerDir.x * 0.35 + (Math.random() - 0.5) * 0.1 + localVector4.x * 0.15, 
             -0.05, 
-            this.playerDir.z * 0.35 + (Math.random() - 0.5) * 0.1 + localVector4.z * 0.12,
+            this.playerDir.z * 0.35 + (Math.random() - 0.5) * 0.1 + localVector4.z * 0.15,
             1,
             right + Math.random() * 0.2,
             localVector6,
+            localVector5,
             1
           );
           _playLittleSplash(
-            this.playerDir.x * 0.35 + (Math.random() - 0.5) * 0.1 + localVector4.x * -0.12, 
+            this.playerDir.x * 0.35 + (Math.random() - 0.5) * 0.1 + localVector4.x * -0.15, 
             -0.05, 
-            this.playerDir.z * 0.35 + (Math.random() - 0.5) * 0.1 + localVector4.z * -0.12,
+            this.playerDir.z * 0.35 + (Math.random() - 0.5) * 0.1 + localVector4.z * -0.15,
             1,
             left + Math.random() * 0.2,
             localVector6,
+            localVector5,
             1
           );
           this.lastLittleSplashEmitTime = timestamp;
@@ -622,7 +628,7 @@ class WaterParticleEffect {
     const swimAction = this.player.getAction('swim');
     const hasSwim = !!swimAction;
     if (hasSwim && this.waterSurfaceHeight < this.player.position.y) {
-       _handleSwimmingSplash(swimAction);
+      _handleSwimmingSplash(swimAction);
     }
     const _handleFreestyleSplash = () => {
       if (this.freestyleSplash) {
@@ -638,7 +644,7 @@ class WaterParticleEffect {
         const brokenAttribute = this.freestyleSplash.geometry.getAttribute('broken');
         const rotationAttribute = this.freestyleSplash.geometry.getAttribute('rotation');
         let emitCount = 0;
-        let maxEmit = 15;
+        let maxEmit = 20;
         for (let i = 0; i < particleCount; i ++) {
           if (hasSwim && swimAction.animationType === 'freestyle' && this.waterSurfaceHeight < this.player.position.y) {
               if (
@@ -647,8 +653,8 @@ class WaterParticleEffect {
                 && emitCount < maxEmit
               ) {
                   const right = this.player.avatarCharacterSfx.currentSwimmingHand === 'right' ? 1 : -1;
-                  brokenAttribute.setX(i, 0.1 + Math.random() * 0.1);
-                  scalesAttribute.setXY(i, 1.5 + Math.random() * 1.5, 1. + Math.random() * 2.5);
+                  brokenAttribute.setX(i, 0.1 + Math.random() * 0.2);
+                  scalesAttribute.setXY(i, 2. + Math.random() * 1.5, 1. + Math.random() * 2.5);
                   const theta = 2. * Math.PI * emitCount / maxEmit;
                   positionsAttribute.setXYZ(
                     i,

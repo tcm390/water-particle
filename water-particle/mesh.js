@@ -134,7 +134,7 @@ const getDivingHigherSplash = () => {
     attributeSpecs.push({name: 'broken', itemSize: 1});
     attributeSpecs.push({name: 'scales', itemSize: 1});
     attributeSpecs.push({name: 'rotation', itemSize: 1});
-    const geometry2 = new THREE.PlaneGeometry(0.25, 0.85);
+    const geometry2 = new THREE.PlaneGeometry(0.25, 0.7);
     const geometry = _getGeometry(geometry2, attributeSpecs, particleCount);
     const material= new THREE.ShaderMaterial({
         uniforms: {
@@ -402,13 +402,14 @@ const getLittleSplash = () => {
         particleCount: particleCount,
         maxEmmit: 5,
         velocity: [particleCount],
-        acc: new THREE.Vector3(0, -0.002, 0),
+        acc: [particleCount],
         brokenVelocity: [particleCount]
     }
     const brokenAttribute = littleSplash.geometry.getAttribute('broken');
     for (let i = 0; i < particleCount; i++) {
         brokenAttribute.setX(i, 1);
         littleSplash.info.velocity[i] = new THREE.Vector3();
+        littleSplash.info.acc[i] = new THREE.Vector3();
     }
     brokenAttribute.needsUpdate = true;
     return littleSplash;
@@ -450,7 +451,7 @@ const getFreestyleSplash = () => {
         particleCount: particleCount,
     }
     group.add(divingHigherSplash);
-    group.rotation.x = Math.PI / 2.3;
+    group.rotation.x = Math.PI / 2.1;
     freeStyleGroup.add(group)
     return freeStyleGroup;
 }

@@ -499,7 +499,7 @@ const freestyleSplashFragment = `\
         if(splash.r < 0.5){
             discard;
         }
-        gl_FragColor.a *= vUv.y * 1.5;
+        gl_FragColor.a *= vUv.y * 1.3;
         if (vUv.y < 0.1) {
             gl_FragColor.a = 0.;
         }
@@ -508,7 +508,7 @@ const freestyleSplashFragment = `\
             gl_FragColor.a = 0.;
         }
 
-        float broken = abs( sin( 1.0 - vBroken ) ) - texture2D( noiseMap, vec2(vUv.x, vUv.y - uTime * 2.) ).g;
+        float broken = abs( sin( 1.0 - vBroken ) ) - texture2D( noiseMap, vec2(vUv.x * 2., vUv.y * 2. - uTime * 4.) ).g;
         if ( broken < 0.0001 ) discard;
         ${THREE.ShaderChunk.logdepthbuf_fragment}
     }
